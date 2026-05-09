@@ -117,7 +117,7 @@ function extractPreview(content, query, radius = 60) {
  */
 export function createTableRow(notice, searchQuery = '', rowNumber = null) {
   const pinnedBadge = notice.isPinned 
-    ? `<span class="inline-flex items-center gap-1 mr-1 sm:mr-2">${icons.pin}</span>` 
+    ? `<span class="inline-flex items-center gap-1 mr-2">${icons.pin}</span>` 
     : '';
 
   const categoryColors = {
@@ -129,7 +129,7 @@ export function createTableRow(notice, searchQuery = '', rowNumber = null) {
   };
   const categoryClass = categoryColors[notice.category] ?? categoryColors['일반'];
   const categoryBadge = notice.category
-    ? `<span class="inline-flex items-center rounded-md border px-1.5 py-0.5 text-xs font-medium mr-1 sm:mr-2 sm:px-2 ${categoryClass}">${notice.category}</span>`
+    ? `<span class="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium mr-2 ${categoryClass}">${notice.category}</span>`
     : '';
 
   const isOpen = notice.isOpen === true;
@@ -150,14 +150,14 @@ export function createTableRow(notice, searchQuery = '', rowNumber = null) {
 
   return `
     <tr class="border-b border-zinc-200 dark:border-zinc-800 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/30 notice-row" data-id="${notice.id}">
-      <td class="align-middle px-2 py-3 text-sm font-medium text-zinc-900 dark:text-zinc-50 whitespace-nowrap w-12 text-center sm:w-20 sm:px-4 sm:py-4">${numberLabel}</td>
-      <td class="px-1.5 py-3 align-middle font-medium sm:p-4">
-        <div class="flex min-w-0 items-center gap-1">
+      <td class="align-middle px-4 py-4 text-sm font-medium text-zinc-900 dark:text-zinc-50 whitespace-nowrap w-20 text-center">${numberLabel}</td>
+      <td class="p-4 align-middle font-medium">
+        <div class="flex items-center gap-1">
           ${pinnedBadge}
           ${categoryBadge}
-          <button class="notice-title min-w-0 flex-1 text-left flex items-center justify-between gap-1.5 sm:gap-2 group" data-id="${notice.id}">
-            <span class="group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors flex min-w-0 flex-col gap-1">
-              <span class="leading-tight break-words">${highlightedTitle}</span>
+          <button class="notice-title flex-1 text-left flex items-center justify-between gap-2 group" data-id="${notice.id}">
+            <span class="group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors flex flex-col gap-1">
+              <span class="leading-tight">${highlightedTitle}</span>
               ${previewHTML}
             </span>
             <span class="${isOpen ? 'chevron-icon open' : 'chevron-icon'}">${icons.chevron}</span>
@@ -165,17 +165,17 @@ export function createTableRow(notice, searchQuery = '', rowNumber = null) {
         </div>
         <div class="accordion-content ${isOpen ? 'open' : ''}" id="accordion-${notice.id}">
           <div>
-            <div class="pt-3 pb-1 pl-1 pr-2 text-sm text-zinc-600 dark:text-zinc-400 space-y-1 border-t border-zinc-100 dark:border-zinc-800 mt-3 sm:pr-10">
+            <div class="pt-3 pb-1 pl-1 pr-10 text-sm text-zinc-600 dark:text-zinc-400 space-y-1 border-t border-zinc-100 dark:border-zinc-800 mt-3">
               ${contentLines}
             </div>
           </div>
         </div>
       </td>
       <td class="hidden sm:table-cell p-4 align-top text-zinc-500 dark:text-zinc-400 whitespace-nowrap w-28">${notice.date ?? formatDate(notice.createdAt)}</td>
-      <td class="px-1.5 py-3 align-top text-right w-10 sm:w-20 sm:p-4">
+      <td class="p-4 align-top text-right w-20">
         <div class="flex items-center justify-end gap-1">
-          ${createButton({ text: '', variant: 'ghost', size: 'icon', icon: icons.edit, className: 'edit-btn h-8 w-8 sm:h-9 sm:w-9', id: `edit-${notice.id}` })}
-          ${createButton({ text: '', variant: 'ghost', size: 'icon', icon: icons.trash, className: 'delete-btn hidden h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 sm:h-9 sm:w-9', id: `delete-${notice.id}` })}
+          ${createButton({ text: '', variant: 'ghost', size: 'icon', icon: icons.edit, className: 'edit-btn', id: `edit-${notice.id}` })}
+          ${createButton({ text: '', variant: 'ghost', size: 'icon', icon: icons.trash, className: 'delete-btn hidden text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950', id: `delete-${notice.id}` })}
         </div>
       </td>
     </tr>
@@ -243,10 +243,10 @@ export function renderTable(notices, searchQuery = '', options = {}) {
       <table class="w-full caption-bottom text-sm">
         <thead class="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
           <tr>
-            <th class="h-10 px-2 text-center align-middle font-medium text-zinc-500 dark:text-zinc-400 w-12 sm:h-12 sm:w-20 sm:px-4">번호</th>
-            <th class="h-10 px-1.5 text-left align-middle font-medium text-zinc-500 dark:text-zinc-400 sm:h-12 sm:px-4">제목</th>
+            <th class="h-12 px-4 text-center align-middle font-medium text-zinc-500 dark:text-zinc-400 w-20">번호</th>
+            <th class="h-12 px-4 text-left align-middle font-medium text-zinc-500 dark:text-zinc-400">제목</th>
             <th class="hidden sm:table-cell h-12 px-4 text-left align-middle font-medium text-zinc-500 dark:text-zinc-400 w-28">작성일</th>
-            <th class="h-10 px-1.5 text-right align-middle font-medium text-zinc-500 dark:text-zinc-400 w-10 sm:h-12 sm:w-20 sm:px-4">관리</th>
+            <th class="h-12 px-4 text-right align-middle font-medium text-zinc-500 dark:text-zinc-400 w-20">관리</th>
           </tr>
         </thead>
         <tbody>
