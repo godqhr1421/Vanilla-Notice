@@ -392,11 +392,12 @@ function handleDelete(id) {
     return;
   }
   
-  if (ui.confirmDialog(`"${notice.title}" 공지사항을 삭제하시겠습니���?`)) {
+  if (ui.confirmDialog(`"${notice.title}" 공지사항을 삭제하시겠습니까?`)) {
     storage.deleteNotice(id);
     ui.showToast('공지사항이 삭제되었습니다', 'success');
     renderApp();
   }
+  
 }
 
 // DOM 로드 후 초기화
