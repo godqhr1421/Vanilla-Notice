@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>공지사항 게시판</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tailwind Config for Shadcn-like styles -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            border: 'hsl(214.3 31.8% 91.4%)',
+            input: 'hsl(214.3 31.8% 91.4%)',
+            ring: 'hsl(222.2 84% 4.9%)',
+            background: 'hsl(0 0% 100%)',
+            foreground: 'hsl(222.2 84% 4.9%)',
+            primary: {
+              DEFAULT: 'hsl(222.2 47.4% 11.2%)',
+              foreground: 'hsl(210 40% 98%)',
+            },
+            secondary: {
+              DEFAULT: 'hsl(210 40% 96.1%)',
+              foreground: 'hsl(222.2 47.4% 11.2%)',
+            },
+            destructive: {
+              DEFAULT: 'hsl(0 84.2% 60.2%)',
+              foreground: 'hsl(210 40% 98%)',
+            },
+            muted: {
+              DEFAULT: 'hsl(210 40% 96.1%)',
+              foreground: 'hsl(215.4 16.3% 46.9%)',
+            },
+            accent: {
+              DEFAULT: 'hsl(210 40% 96.1%)',
+              foreground: 'hsl(222.2 47.4% 11.2%)',
+            },
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+          },
+          keyframes: {
+            'slide-up': {
+              '0%': { transform: 'translateY(100%)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' },
+            },
+            'fade-out': {
+              '0%': { opacity: '1' },
+              '100%': { opacity: '0' },
+            },
+          },
+          animation: {
+            'slide-up': 'slide-up 0.3s ease-out',
+            'fade-out': 'fade-out 0.3s ease-out',
+          },
+        },
+      },
+    }
+  </script>
+  
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #d4d4d8;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a1a1aa;
+    }
+    
+    /* Focus visible styles */
+    *:focus-visible {
+      outline: 2px solid hsl(222.2 84% 4.9%);
+      outline-offset: 2px;
+    }
+
+    /* Accordion content animation */
+    .accordion-content {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.3s ease;
+    }
+    .accordion-content.open {
+      grid-template-rows: 1fr;
+    }
+    .accordion-content > div {
+      overflow: hidden;
+    }
+
+    /* Chevron rotation */
+    .chevron-icon {
+      transition: transform 0.3s ease;
+    }
+    .chevron-icon.open {
+      transform: rotate(180deg);
+    }
+
+    /* Category tab active */
+    .category-tab.active {
+      background-color: rgb(24 24 27);
+      color: rgb(250 250 250);
+      border-color: rgb(24 24 27);
+    }
+    .category-tab.active:hover {
+      background-color: rgb(39 39 42);
+      color: rgb(250 250 250);
+    }
+    .dark .category-tab.active {
+      background-color: rgb(250 250 250);
+      color: rgb(24 24 27);
+      border-color: rgb(250 250 250);
+    }
+    .dark .category-tab.active:hover {
+      background-color: rgb(228 228 231);
+      color: rgb(24 24 27);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 antialiased">
+  <!-- Header -->
+  <header class="sticky top-0 z-40 w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+    <div class="container mx-auto flex h-14 max-w-5xl items-center px-4">
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-900 dark:text-zinc-50">
+          <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/>
+          <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        </svg>
+        <span class="font-semibold text-lg">공지사항 게시판</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto max-w-5xl px-4 py-8">
+    <!-- Toolbar -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">공지사항</h1>
+        <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">중요한 안내사항을 확인하세요</p>
+      </div>
+      
+      <div class="flex items-center gap-2 flex-wrap">
+        <!-- Data Management Buttons -->
+        <button id="download-btn" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 h-9 px-3" title="JSON 다운로드">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" x2="12" y1="15" y2="3"/>
+          </svg>
+          <span class="hidden sm:inline">다운로드</span>
+        </button>
+        
+        <button id="upload-btn" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 h-9 px-3" title="JSON 업로드">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" x2="12" y1="3" y2="15"/>
+          </svg>
+          <span class="hidden sm:inline">업로드</span>
+        </button>
+        <input type="file" id="file-input" accept=".json" class="hidden">
+        
+        <button id="reset-btn" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 h-9 px-3" title="초기화">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+          <span class="hidden sm:inline">초기화</span>
+        </button>
+        
+        <div class="w-px h-6 bg-zinc-200 dark:bg-zinc-800 hidden sm:block"></div>
+
+        <!-- Delete Mode Button -->
+        <button id="delete-mode-btn" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-950 dark:hover:text-red-400 dark:hover:border-red-900 h-9 px-3" title="삭제 모드">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+          </svg>
+          <span class="hidden sm:inline">삭제 모드</span>
+        </button>
+
+        <div class="w-px h-6 bg-zinc-200 dark:bg-zinc-800 hidden sm:block"></div>
+        
+        <!-- Add Notice Button -->
+        <button id="add-notice-btn" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-zinc-900 dark:bg-zinc-50 text-zinc-50 dark:text-zinc-900 shadow hover:bg-zinc-900/90 dark:hover:bg-zinc-50/90 h-9 px-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/>
+            <path d="M12 5v14"/>
+          </svg>
+          <span>새 공지</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="relative mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+      </svg>
+      <input
+        type="text"
+        id="search-input"
+        placeholder="제목 또는 내용으로 검색..."
+        class="flex h-9 w-full rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 pl-9 pr-4 py-1 text-sm shadow-sm transition-colors placeholder:text-zinc-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-950 dark:focus-visible:ring-zinc-300"
+      >
+    </div>
+
+    <!-- Category Tabs -->
+    <div id="category-tabs" class="flex items-center gap-1 flex-wrap mb-4">
+      <!-- JS에서 렌더링됩니다 -->
+    </div>
+
+    <!-- Notices Table Container -->
+    <div id="notices-container">
+      <!-- 테이블이 여기에 렌더링됩니다 -->
+    </div>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="border-t border-zinc-200 dark:border-zinc-800 mt-auto">
+    <div class="container mx-auto max-w-5xl px-4 py-6">
+      <p class="text-center text-sm text-zinc-500 dark:text-zinc-400">
+        &copy; 2024 공지사항 게시판. 바닐라 JS + Tailwind CSS로 제작되었습니다.
+      </p>
+    </div>
+  </footer>
+  
+  <!-- Modals Container -->
+  <div id="modals-container"></div>
+  
+  <!-- Main Script -->
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
